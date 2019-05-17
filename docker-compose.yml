@@ -1,2 +1,26 @@
 version: "3.7"
 services:
+  downloader:
+    build:
+      context: ./downloader
+      dockerfile: Dockerfile-downloader
+    environment:
+      PUID: 1001
+      PGID: 1001
+      CAMERA_HOST: ${CAMERA_HOST}
+      CAMERA_USER: ${CAMERA_USER}
+      CAMERA_PWD: ${CAMERA_PWD}
+      OUT_DIRECTORY: ${OUT_DIRECTORY}
+    volumes:
+      - ${VIDEO_DIRECTORY}:${OUT_DIRECTORY}
+  video-cron:
+    build:
+      context: ./video-cron
+    volumes:
+      - ${VIDEO_DIRECTORY}:${OUT_DIRECTORY}
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      VIDEO_BUCKET: ${VIDEO_BUCKET}
+      OUT_DIRECTORY: ${OUT_DIRECTORY}
+      EXPIRE_AFTER: ${EXPIRE_AFTER}
