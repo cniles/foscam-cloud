@@ -17,11 +17,11 @@ do
 		echo "FFMPEG Encoding did not succeed for video $d"
 	    fi
 	fi
-	if [[ -f "$d/$filename" ]] && [[ ! -f ".uploaded" ]]; then
+	if [[ -f "$d/$filename" ]] && [[ ! -f "$d/.uploaded" ]]; then
 	    echo "Uploading $video to S3, expires on $expiration ($EXPIRE_AFTER days)"
 	    aws s3 cp $d/$filename s3://$VIDEO_BUCKET/$day/$filename --expires $expiration --only-show-errors
 	    if [[ $? -eq 0 ]] ; then
-		touch .uploaded
+		touch $d/.uploaded
 	    else
 		echo "Upload to S3 failed"
 	    fi
