@@ -9,12 +9,22 @@ expiration=$(date -I -d"$expiration_date_input")
 
 for d in $(ls ./)
 do
-    filename=$d.mkv
     if [[ "$now" -gt "$d" ]]; then
-	if [ ! -f ./$d/$d.mkv ]; then
+	filename="$d.mkv"
+	if [ ! -f "./$d/$filename" ]; then
 	    cat $d/*.jpg | ffmpeg -loglevel error -r 1 -i -  -pix_fmt yuv420p -r 10 $d/$filename
-	    echo "Uploading $video to S3, expires $expiration ($EXPIRE_AFTER days)"
-	    aws s3 cp $d/$filename s3://$VIDEO_BUCKET/$day/$filename --expires $expiration
+	    if [ ! -f "./$d/$filename" ]; then	
+		echo "FFMPEG Encoding did not succeed for video $d"
+	    fi
+	fi
+	if [[ -f "$d/$filename" ]] && [[ ! -f ".uploaded" ]]; then
+	    echo "Uploading $video to S3, expires on $expiration ($EXPIRE_AFTER days)"
+	    aws s3 cp $d/$filename s3://$VIDEO_BUCKET/$day/$filename --expires $expiration --only-show-errors
+	    if [[ $? -eq 0 ]] ; then
+		touch .uploaded
+	    else
+		echo "Upload to S3 failed"
+	    fi
        fi
     fi
 done
