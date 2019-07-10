@@ -2,3 +2,4 @@
 .env
 snapshot
 images
+*.class
