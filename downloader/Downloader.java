@@ -55,8 +55,12 @@ public class Downloader {
 		} else {
 		    System.err.format("Received a non-200 response! %s", code);
 		}
-	    } catch (Throwable e) {
+	    } catch (Exception e) {
 		System.err.println("Download failed: " + e.getMessage());
+	    } catch (Throwable e) {
+		System.err.println("Fatal error! Docker take the wheel");
+		e.printStackTrace();
+		System.exit(1);
 	    }
 	}
     }
