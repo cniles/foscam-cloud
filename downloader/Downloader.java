@@ -29,7 +29,6 @@ public class Downloader {
 	DownloaderTask(String endpoint, String outDir) {	    
 	    this.endpoint = endpoint;
 	    this.outDir = outDir;
-
 	}
 	
 	@Override
@@ -47,12 +46,15 @@ public class Downloader {
 		connection.setRequestMethod("GET");
 		connection.connect();
 		int code = connection.getResponseCode();
-
-		try(InputStream inputStream = connection.getInputStream()) {
-		    Files.copy(inputStream, outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		if (code == 200) {
+		    try(InputStream inputStream = connection.getInputStream()) {
+			Files.copy(inputStream, outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		    }
+		} else {
+		    System.err.format("Received a non-200 response! %s", code);
 		}
 	    } catch (Exception e) {
-		e.printStackTrace();
+		System.err.println("Download failed: " + e.getMessage());
 	    }
 	}
     }
