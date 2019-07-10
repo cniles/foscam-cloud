@@ -1,5 +1,7 @@
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.lang.Runnable;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.net.URL;
@@ -18,7 +20,7 @@ public class Downloader {
     private static final String OUT_DIRECTORY = "OUT_DIRECTORY";
     private static final String ENDPOINT_FORMAT = "http://%s/snapshot.cgi?user=%s&pwd=%s";
     
-    static class DownloaderTask extends TimerTask {
+    static class DownloaderTask implements Runnable {
 
 	SimpleDateFormat prefixFmt = new SimpleDateFormat("yyyyMMddHH");
 	SimpleDateFormat nameFmt = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -53,7 +55,7 @@ public class Downloader {
 		} else {
 		    System.err.format("Received a non-200 response! %s", code);
 		}
-	    } catch (Exception e) {
+	    } catch (Throwable e) {
 		System.err.println("Download failed: " + e.getMessage());
 	    }
 	}
@@ -79,8 +81,8 @@ public class Downloader {
 
 	String endpoint = String.format(ENDPOINT_FORMAT, host, user, pwd);
 	
-	Timer timer = new Timer("Downloader");
+	ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
 
-	timer.schedule(new DownloaderTask(endpoint, outDir), 0, 1000);
+	executorService.scheduleAtFixedRate(new DownloaderTask(endpoint, outDir), 0, 1, TimeUnit.SECONDS);
     }
 }
