@@ -45,6 +45,8 @@ public class Downloader {
 		File outFile = new File(prefixFile, name);
 		URL url = new URL(endpoint);
 		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+		connection.setConnectTimeout(100);
+		connection.setReadTimeout(900);
 		connection.setRequestMethod("GET");
 		connection.connect();
 		int code = connection.getResponseCode();
